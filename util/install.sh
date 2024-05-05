@@ -778,7 +778,7 @@ function all {
     # Skip mn_doc (doxypy/texlive/fonts/etc.) because it's huge
     # mn_doc
     of
-    install_wireshark
+    #install_wireshark
     ovs
     # We may add ivs once it's more mature
     # ivs
