@@ -1235,6 +1235,8 @@ class MiniEdit( Frame ):
         self.controllerCount = 0
         self.net = None
 
+        print("MiniEdit is initialized.")
+
         # Close window gracefully
         Wm.wm_protocol( self.top, name='WM_DELETE_WINDOW', func=self.quit )
 
