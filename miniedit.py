@@ -1135,7 +1135,7 @@ class MiniEdit( Frame ):
         self.top.title( self.appName )
 
         # Menu bar
-        self.createMenubar()
+        #self.createMenubar()
 
         # Editing canvas
         self.cheight, self.cwidth = cheight, cwidth
