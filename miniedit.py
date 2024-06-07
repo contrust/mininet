@@ -17,6 +17,7 @@ import json
 import os
 import re
 import sys
+import signal
 
 from functools import partial
 from optparse import OptionParser  # pylint: disable=deprecated-module
@@ -1431,19 +1432,13 @@ class MiniEdit( Frame ):
             return text.encode('utf-8')
         return text
 
-    def loadTopology( self ):
+    def loadTopology( self, fileName ):
         "Load command."
         c = self.canvas
 
-        myFormats = [
-            ('Mininet Topology','*.mn'),
-            ('All Files','*'),
-        ]
-        f = tkFileDialog.askopenfile(filetypes=myFormats, mode='rb')
-        if f is None:
-            return
         self.newTopology()
-        loadedTopology = self.convertJsonUnicode(json.load(f))
+        with open(fileName, mode="r") as f:
+            loadedTopology = json.load(f)
 
         # Load application preferences
         if 'application' in loadedTopology:
@@ -1616,15 +1611,8 @@ class MiniEdit( Frame ):
         self.controllers = {}
         self.appPrefs["ipBase"]= self.defaultIpBase
 
-    def saveTopology( self ):
-        "Save command."
-        myFormats = [
-            ('Mininet Topology','*.mn'),
-            ('All Files','*'),
-        ]
-
+    def saveTopology( self, fileName ):
         savingDictionary = {}
-        fileName = tkFileDialog.asksaveasfilename(filetypes=myFormats ,title="Save the topology as...")
         if len(fileName ) > 0:
             # Save Application preferences
             savingDictionary['version'] = '2'
@@ -1680,14 +1668,10 @@ class MiniEdit( Frame ):
             # Save Application preferences
             savingDictionary['application'] = self.appPrefs
 
-            try:
-                with open(fileName, 'w') as f:
-                    f.write(
-                        json.dumps(savingDictionary,
+            with open(fileName, 'w') as f:
+                f.write(json.dumps(savingDictionary,
                                    sort_keys=True,
                                    indent=4, separators=(',', ': ')))
-            except Exception as er:  # pylint: disable=broad-except
-                warn( er, '\n' )
 
     def exportScript( self ):
         "Export command."
@@ -3595,6 +3579,24 @@ def addDictOption( opts, choicesDict, default, name, helpStr=None ):
 if __name__ == '__main__':
     setLogLevel( 'info' )
     app = MiniEdit()
+
+    config_path = "./topology.mn"
+    
+    def handle_usr1(signumber, frame):
+        try:
+            app.saveTopology(config_path)
+        except Exception as e:
+            showerror(title="Save topology", message="Exception: " + str(e))
+
+    def handle_usr2(signumber, frame):
+        try:
+            app.loadTopology(config_path)
+        except Exception as e:
+            showerror(title="Load topology", message="Exception: " + str(e))
+
+    signal.signal(signal.SIGUSR1, handle_usr1);
+    signal.signal(signal.SIGUSR2, handle_usr2)
+
     app.parseArgs()
     ### import topology if specified ###
     app.importTopo()
