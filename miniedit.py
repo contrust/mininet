@@ -3595,6 +3595,7 @@ if __name__ == '__main__':
     def handle_usr2(signumber, frame):
         try:
             app.loadTopology(config_path)
+            os.remove(config_path)       
         except Exception as e:
             showerror(title="Load topology", message="Exception: " + str(e))
 
