@@ -3586,13 +3586,15 @@ if __name__ == '__main__':
         try:
             app.saveTopology(config_path)
             info("Topology saved.")
+            with open(config_path, 'r') as fin:
+                info(fin.read())
+            info("Topology printed.")
         except Exception as e:
             showerror(title="Save topology", message="Exception: " + str(e))
 
     def handle_usr2(signumber, frame):
         try:
             app.loadTopology(config_path)
-            info("Topology loaded.")
         except Exception as e:
             showerror(title="Load topology", message="Exception: " + str(e))
 
